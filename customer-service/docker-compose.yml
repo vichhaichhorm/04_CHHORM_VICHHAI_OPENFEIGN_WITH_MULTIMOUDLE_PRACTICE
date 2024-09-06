@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2003
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - spring-network
+    restart: unless-stopped
+
+  spring-app:
+    container_name: spring-app
+    image: feignclient:latest
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/feign_client_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 2003
+    networks:
+      - spring-network
+    restart: unless-stopped
+
+networks:
+  spring-network:
+    driver: bridge
+
+volumes:
+  postgres:
